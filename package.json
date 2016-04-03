@@ -4,3 +4,21 @@
   "description": "Multiplayer.js ==============",
   "main": "multiplayer.js",
   "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dudeofawesome/Multiplayer.js.git"
+  },
+  "author": "Louis Orleans <louis@orleans.io> (http://orleans.io/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dudeofawesome/Multiplayer.js/issues"
+  },
+  "homepage": "https://github.com/dudeofawesome/Multiplayer.js"
+}
