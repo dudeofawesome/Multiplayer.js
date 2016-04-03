@@ -1,53 +1,11 @@
 <html>
 	<head>
-		<title>Multiplayer.js example</title>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/mp/multiplayer.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="author" content="Josh Gibbs" />
+		<title>Multiplayer.js Demo</title>
+		<script language="JavaScript" type="text/javascript" src="example.js"></script>
+        <script language="JavaScript" type="text/javascript" src="Canvas.js"></script>
 	</head>
-	<style>
-		span, div {
-			width: 10px;
-			height: 10px;
-			background-color: red;
-			position: absolute;
-		}
-	</style>
 	<body>
-		<span id="me"></span>
-		<script type="text/javascript">
-			onload = function() {
-
-				// Sets up and connects to the multiplayer server
-				var mul = new Multiplayer({ x:0, y:0 }, {
-
-					// Adds squares when other players connect
-					onconnect: function( client, id ) {
-						document.body.appendChild( document.createElement( "div" ) )
-					},
-
-					// Removes squares when other players disconnect
-					ondisconnect: function( client, id ) {
-						document.body.removeChild( document.getElementsByTagName("div")[id] )
-					},
-
-					// Updates player locations when we receive their data
-					onreceive: function( clients ) {
-						for( var i in clients ) {
-							document.getElementsByTagName("div")[i].style.left = clients[i].x
-							document.getElementsByTagName("div")[i].style.top = clients[i].y
-						}
-					}
-
-				});
-
-				// Updates mul.me and square position on the screen
-				addEventListener( "mousemove", function( event ) {
-					mul.update({ x:event.pageX, y:event.pageY })
-					document.getElementById("me").style.left = mul.me.x
-					document.getElementById("me").style.top = mul.me.y
-				});
-
-			}
-		</script>
 	</body>
 </html>
