@@ -1,93 +1,175 @@
+(() => {
+    'use strict';
+
+    var fs = require('fs');
+
+    module.exports = (socket, app) => {
+        let mp = {
+            init: (subdir) => {
+                return new Promise((resolve) => {
+                    let mpScript;
+                    fs.readFile(`./multiplayer${(process.env.PRODUCTION) ? '.min' : ''}.js`, (err, file) => {
+                        mpScript = file.toString();
+                    });
+
+                    app.get(`/${subdir}/`, (req, res) => {
+                        res.send('Hello world');
+                    });
+                    app.get(`/${subdir}/multiplayer.js`, (req, res) => {
+                        res.set('Content-Type', 'application/javascript');
+                        res.send(mpScript);
+                    });
+
+                    socket.on('connection', (client) => {
+                        console.log(`Client #${client.id} connected`);
+                    });
+                    resolve();
+                });
+            },
+            start: () => {
+                return new Promise((resolve) => {
+                    resolve();
+                });
+            },
+            stop: () => {
+                return new Promise((resolve) => {
+                    resolve();
+                });
+            }
+        };
+
+        return mp;
+    };
+})();
+
 /*
- * Multiplayer Engine Demo
- * @author Josh Gibbs - uPaymeiFixit@gmail.com
-*/ console.log("v3r0613121918 at " + new Date());
+ * Multiplayer.JS
+ * @author Josh Gibbs - uPaymeiFixit@gmail.com, Louis Orleans - louis@0rleans.com
+*/
 
-var port = 4000,
-	TXspeed = 1000/30,
-	clients = [],
-	cID = [],
-	sID = [],
-	io;
+/*console.log("Version 0.0.1\nBuilt on 2014.12.30\nServer started at " + new Date());
 
-( function()
-{
-	io = require( "socket.io" ).listen( port );
-	io.set( "log level", 1 );
+var PORT = 4000,
+	MAXSERVERS = 1,
+	TXspeed = 1000 / 30,
+	rooms = [],
+	players = [];
 
+var app = require('http').createServer(handler)
+var io = require('socket.io')(app);
+var fs = require('fs');
 
+var DATE = new Date();
 
+function handler (req, res) {
+  fs.readFile(__dirname + '/example.html',
+  function (err, data) {
+    if (err) {
+      res.writeHead(500);
+      return res.end('Error loading example.html');
+    }
 
-	// TX Loop
-	setInterval( function()
-	{
-		io.sockets.volatile.emit( "RX", clients );
-	}, TXspeed );
+    res.writeHead(200);
+    res.end(data);
+  });
+}
 
+io.on('connection', function (socket) {
+	console.log("new user connected");
+	socket.on('Reconnect', function (msg) {
 
-
-
-	// Start connection
-	io.sockets.on( "connection", function( socket )
-	{
-
-		return socket.on( "firstConnect", function( client )
-		{
-			socket.broadcast.emit( "addClient", client );
-			socket.emit( "firstConnect", clients, cID[socket.id] = sID.push( socket.id ) - 1 );
-			clients.push( client );
-
-			console.log("Client with SID: " + socket.id + " and CID: " + cID[socket.id] + " has connected.");
-			console.log("There are now " + sID.length + " clients.");
-
-
-			socket.on( "TX", function( client )
-			{
-				clients[cID[socket.id]] = client;
-			});
-
-			socket.on( "message", function( message )
-			{
-				socket.broadcast.send( message, cID[socket.id] );
-			});
-
-			socket.on( "c_eval", function( string )
-			{
-				socket.broadcast.emit( "c_eval", string );
-			});
-
-			socket.on( "s_eval", function( string )
-			{
-				console.log('Evaluating: "' + string + '"');
-				eval( string ); // Screw you JSlint, eval is not always evil
-			});
-
-			// TODO Clean up functions that contain only single functions
-			socket.on( "ping", function( time )
-			{
-				socket.emit( "ping", time );
-			});
-
-			return socket.on( "disconnect", function()
-			{
-				console.log("Client with SID: " + socket.id + " and CID: " + cID[socket.id] + " is disconnecting.");
-			
-				socket.broadcast.emit( "removeClient", clients[cID[socket.id]], cID[socket.id] );
-
-				clients.splice(cID[socket.id],1);
-				sID.splice(cID[socket.id],1);
-				var n = cID[socket.id];
-				delete cID[socket.id];
-				for ( var i = n; i < sID.length; i++ )
-				{
-					--cID[sID[i]];
-				}
-
-				console.log("There are now " + sID.length + " clients.");
-			});
-
-
-		});
 	});
+	socket.on('Get Rooms', function (msg) {
+		if (msg == null) {
+			var _rooms = [];
+			for (var i = rooms.length - 1; i >= 0; i--) {
+				_rooms.push({name: rooms[i].name, message: rooms[i].message, ID: rooms[i].ID, players: players[i].length + "/" + rooms[i].maxPlayers});
+			};
+			io.to(socket.id).emit('Get Rooms', _rooms);
+		} else { // actually care about region request
+			var _rooms = [];
+			for (var i = rooms.length - 1; i >= 0; i--) {
+				_rooms.push({name: rooms[i].name, message: rooms[i].message, ID: rooms[i].ID, players: players[i].length + "/" + rooms[i].maxPlayers});
+			};
+			io.to(socket.id).emit('Get Rooms', _rooms);
+		}
+	});
+	socket.on('Join Room', function (ID) {
+		var room = {};
+		var i = rooms.length - 1;
+		for (; i >= 0; i--) {
+			if (rooms[i].ID == ID) {
+				room = rooms[i];
+			}
+		}
+		players[i].push(new Player());
+		io.to(socket.id).emit('Join Room', room);
+	});
+	socket.on('Create Room', function (msg) {
+		if (rooms.length < MAXSERVERS) {
+			var room = new Room();
+			if (msg.name != null)
+				room.name = msg.name;
+			if (msg.message != null)
+				room.message = msg.message;
+			if (msg.maxPlayers != null && msg.maxPlayers > 0)
+				room.maxPlayers = msg.maxPlayers;
+			rooms.push(room);
+			io.to(socket.id).emit('Join Room', room);
+		}
+	});
+	socket.on('Update Players', function (msg) {
+		for (var i = rooms.length - 1; i >= 0; i--) {
+			for (var j = players[i].length - 1; j >= 0; j--) {
+				if (socket.id == players[i][j].sID) {
 
-}).call(this);
+				}
+			};
+		};
+	});
+	socket.on('Message', function (msg) {
+		if (msg.to == null)
+			io.emit('Message', msg.messge);
+		else { // actually send ping to requested user
+			io.emit('Message', msg.messge);
+		}
+	});
+	socket.on('Ping', function (time) {
+		io.to(socket.id).emit('Ping', time)
+	});
+});
+
+app.listen(PORT, function () {
+ 	console.log('listening on *:' + PORT);
+});
+
+
+
+function findPlayer (ID) {
+	ID = ID.split(':');
+	var _room = ID[0];
+	var _player = ID[1];
+	return players[_room, _player];
+}
+
+// Predefined Objects
+function Room () {
+	this.name = "Server";
+	this.message = "This is a standard message";
+	this.ID = 0;
+	this.maxPlayers = 32;
+	this.enviroment = [];
+}
+
+function Player () {
+	this.name = "Player";
+	this.room = 0;
+	this.ID = 0;
+	this.sID = 0;
+	this.health = 100;
+	this.position = {x:0, y:0, z:0};
+	this.rotation = {x:0, y:0, z:0};
+	this.lastPosition = {x:0, y:0, z:0};
+	this.lastRotation = {x:0, y:0, z:0};
+}
+*/

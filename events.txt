@@ -1,0 +1,45 @@
+EVENTS
+	Connect
+	Disconnect
+	Reconnect
+		SERVER RECEIVE
+			"Reconnected"
+		CLIENT RECEIVE
+			"Reconnected"
+	Get Rooms
+		SERVER RECEIVE
+			[Server region]
+		CLIENT RECEIVE
+			List of rooms, [Region searched]
+	Join Room
+		SERVER RECEIVE
+			Room ID to join
+		CLIENT RECEIVE
+			Room environment, Players in room, current room score
+	Create Room
+		SERVER RECEIVE
+			Room name, [Room message, Max Players, Server region]
+		CLIENT RECEIVE
+	Update Players
+		SERVER RECEIVE
+			Player data to update
+		CLIENT RECEIVE
+			Player data to update
+	Update Environment
+		CLIENT RECEIVE
+	Add Player
+		CLIENT RECEIVE
+			Object of player to add
+	Remove Player
+		CLIENT RECEIVE
+			Player to remove, Reason to remove
+	Message
+		SERVER RECEIVE
+			Player or group to send to, Message to send
+		CLIENT RECEIVE
+			Sending player, Message
+	Ping
+		SERVER RECEIVE
+			[User to ping against]
+		CLIENT RECE
+			Time of message received, [User pinged against]
