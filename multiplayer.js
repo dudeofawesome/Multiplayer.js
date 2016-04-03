@@ -43,6 +43,16 @@ var Multiplayer = function (attached, callbacks, port, address) {
     {
         /***** DATA CONTROL *****/
 
+        socket.on('RX', (data) => {
+            console.log('RX');
+            console.log(data);
+        });
+
+        socket.on('TX', (data) => {
+            console.log('TX');
+            console.log(data);
+        });
+
         // First data received
         this.on('firstConnect', function (clients, myid)
         {
@@ -113,7 +123,7 @@ var Multiplayer = function (attached, callbacks, port, address) {
         socket.onmessage(message, id >= socket.id ? --id : id);
     });
 
-    socket.options = socket.socket.options;
+    // socket.options = socket.socket.options;
 
     /***** CALLBACKS *****/
 

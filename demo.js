@@ -1,23 +1,24 @@
 (() => {
     'use strict';
 
-    var app = require('express')();
+    var express = require('express');
+    var app = express();
     var http = require('http').Server(app);
     var server;
-    var socket = require('socket.io')(http);
-    var multiplayer_server = require('./multiplayer_server')(socket, app);
-    var fs = require('fs');
+    var io = require('socket.io')(http);
+    var multiplayer_server = require('./multiplayer_server')(io, app);
+    // var fs = require('fs');
 
-
-    let exampleHtml;
-    fs.readFile(`./example.html`, (err, file) => {
-        exampleHtml = file.toString();
-    });
-
-    app.get(`/`, (req, res) => {
-        res.set('Content-Type', 'text/html');
-        res.send(exampleHtml);
-    });
+    // let exampleHtml;
+    // fs.readFile(`./example.html`, (err, file) => {
+    //     exampleHtml = file.toString();
+    // });
+    //
+    // app.get(`/`, (req, res) => {
+    //     res.set('Content-Type', 'text/html');
+    //     res.send(exampleHtml);
+    // });
+    app.use(express.static(__dirname + '/demo-page'));
 
     multiplayer_server.init('mp').then(() => {
         multiplayer_server.start().then(() =>  {

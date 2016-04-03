@@ -2,8 +2,12 @@
     'use strict';
 
     var fs = require('fs');
+    var timer;
+    var DELAY = 1000 / 30;
 
-    module.exports = (socket, app) => {
+    module.exports = (io, app) => {
+        let players = [];
+
         let mp = {
             init: (subdir) => {
                 return new Promise((resolve) => {
@@ -20,14 +24,23 @@
                         res.send(mpScript);
                     });
 
-                    socket.on('connection', (client) => {
+                    io.on('connection', (client) => {
+                        players[client.id] = {};
                         console.log(`Client #${client.id} connected`);
+                        client.on('TX', (data) => {
+                            console.log(data);
+                            players[client.id] = data;
+                            // io.broadcast.emit('TX', data);
+                        });
                     });
                     resolve();
                 });
             },
             start: () => {
                 return new Promise((resolve) => {
+                    timer = setInterval(() => {
+                        io.emit('RX', players);
+                    }, DELAY);
                     resolve();
                 });
             },
@@ -46,8 +59,8 @@
  * Multiplayer.JS
  * @author Josh Gibbs - uPaymeiFixit@gmail.com, Louis Orleans - louis@0rleans.com
 */
-
-/*console.log("Version 0.0.1\nBuilt on 2014.12.30\nServer started at " + new Date());
+/*
+console.log("Version 0.0.1\nBuilt on 2014.12.30\nServer started at " + new Date());
 
 var PORT = 4000,
 	MAXSERVERS = 1,
