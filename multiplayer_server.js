@@ -3,10 +3,10 @@
 
     var fs = require('fs');
     var timer;
-    var DELAY = 1000 / 30;
+    var INTERVAL = 1000 / 30;
 
     module.exports = (io, app) => {
-        let players = [];
+        let players = {};
 
         let mp = {
             init: (subdir) => {
@@ -27,10 +27,21 @@
                     io.on('connection', (client) => {
                         players[client.id] = {};
                         console.log(`Client #${client.id} connected`);
-                        client.on('TX', (data) => {
-                            console.log(data);
+                        client.broadcast.emit('newPlayer', {id: client.id});
+
+                        for (let i in io.sockets.sockets) {
+                            if (io.sockets.sockets[i].id !== client.id) {
+                                client.emit('newPlayer', {id: io.sockets.sockets[i].id});
+                            }
+                        }
+
+                        client.on('tick', (data) => {
                             players[client.id] = data;
-                            // io.broadcast.emit('TX', data);
+                        });
+
+                        client.on('disconnect', () => {
+                            client.broadcast.emit('deadPlayer', client.id);
+                            delete players[client.id];
                         });
                     });
                     resolve();
@@ -39,8 +50,8 @@
             start: () => {
                 return new Promise((resolve) => {
                     timer = setInterval(() => {
-                        io.emit('RX', players);
-                    }, DELAY);
+                        io.emit('tick', players);
+                    }, INTERVAL);
                     resolve();
                 });
             },
