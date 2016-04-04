@@ -30,7 +30,6 @@ var Multiplayer = function (self, sync, port, address) {
 
 
     socket.on('connect', () => {
-        document.getElementById('id').innerHTML = 'ID: /#' + socket.id;
         console.log('Connected');
         console.log('Syncing ' + self);
 
