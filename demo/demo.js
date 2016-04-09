@@ -2,6 +2,7 @@ var ctx;
 var pen = new Pen();
 var pens = [];
 var drawings = [];
+var currentLine = 0;
 
 function Pen (id) {
     this.id = id;
@@ -66,24 +67,32 @@ window.onload = function () {
         pen.color = '#' + intToRGB(hashCode(id));
         pen.id = id;
     });
+
     mp.addCallback('newPlayer', (player) => {
         var newPen = new Pen(player.id);
         pens[player.id] = newPen;
         mp.linkPlayerID(player.id, newPen);
     });
+
     mp.addCallback('deadPlayer', (id) => {
         pens[id] = undefined;
         mp.unlinkPlayerID(id);
+    });
+
+    mp.addCallback('newLine', (line) => {
+        drawings.push(line);
     });
 
     ctx = new Canvas({color: 'rgb(45,45,45)', dblclick_fullscreen:true});
 
     Input.bind('onmousedown', function () {
         pen.down = true;
-        drawings.push({color: pen.color, path: []});
+        currentLine = drawings.push({color: pen.color, path: []}) - 1;
     });
     Input.bind('onmouseup', function () {
         pen.down = false;
+        console.log(currentLine);
+        mp.emit('newLine', drawings[currentLine]);
     });
     Input.bind('onmousemove', function (x, y) {
         pen.x = x;
