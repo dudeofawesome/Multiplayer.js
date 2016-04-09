@@ -1,0 +1,25 @@
+{
+  "name": "multiplayer.js",
+  "description": "A general purpose multiplayer engine",
+  "main": "multiplayer.js",
+  "authors": [
+    "Louis Orleans <louis@orleans.io> (http://orleans.io/)",
+    "Josh Gibbs <josh@gibbs.tk> (http://gibbs.tk/)"
+  ],
+  "license": "GPL-2.0",
+  "keywords": [
+    "multiplayer",
+    "multiplayer.js"
+  ],
+  "homepage": "https://github.com/dudeofawesome/Multiplayer.js",
+  "moduleType": [
+    "amd"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

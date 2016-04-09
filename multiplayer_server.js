@@ -12,7 +12,7 @@
             init: (subdir) => {
                 return new Promise((resolve) => {
                     let mpScript;
-                    fs.readFile(`./multiplayer${(process.env.PRODUCTION) ? '.min' : ''}.js`, (err, file) => {
+                    fs.readFile(`./${(process.env.PRODUCTION) ? 'dist/' : 'src/'}multiplayer${(process.env.PRODUCTION) ? '.min' : ''}.js`, (err, file) => {
                         mpScript = file.toString();
                     });
 
@@ -39,10 +39,24 @@
                             players[client.id] = data;
                         });
 
+                        client.on('message', (message) => {
+                            client.broadcast.emit('message', message);
+                        });
+
                         client.on('disconnect', () => {
                             client.broadcast.emit('deadPlayer', client.id);
                             delete players[client.id];
                         });
+
+                        // catch-all
+                        client.onevent = function (packet) {
+                            if (client._events[packet.data[0]]) {
+                                client._events[packet.data[0]](packet.data[1]);
+                            } else {
+                                // TODO: Insert server side callback for custom scripting
+                                client.broadcast.emit(packet.data[0], packet.data[1]);
+                            }
+                        };
                     });
                     resolve();
                 });
@@ -50,7 +64,7 @@
             start: () => {
                 return new Promise((resolve) => {
                     timer = setInterval(() => {
-                        io.emit('tick', players);
+                        io.volatile.emit('tick', players);
                     }, INTERVAL);
                     resolve();
                 });
