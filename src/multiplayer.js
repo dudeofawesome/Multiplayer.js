@@ -1,9 +1,9 @@
 /*
- * Multiplayer Engine Demo
+ * General Purpose Multiplayer Engine
  * @author Josh Gibbs - uPaymeiFixit@gmail.com, Louis Orleans - louis@0rleans.com
 */
 
-var Multiplayer = function (self, sync, port, address) {
+var Multiplayer = (self, sync, port, address) => {
     'use strict';
 
     var INTERVAL = 1000 / 30;
@@ -79,7 +79,7 @@ var Multiplayer = function (self, sync, port, address) {
 
         // catch-all
         var onevent = socket.onevent;
-        socket.onevent = function (packet) {
+        socket.onevent = (packet) => {
             if (socket._callbacks['$' + packet.data[0]]) {
                 onevent.call(this, packet);
             } else {
