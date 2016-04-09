@@ -8,8 +8,7 @@ function Pen (id) {
     this.id = id;
     this.x = 0;
     this.y = 0;
-    this.width = 20;
-    this.height = 20;
+    this.scale = 1;
     this.down = false;
     this.color = 'red';
     this.img = new Image();
@@ -34,6 +33,28 @@ function intToRGB (i) {
     return '00000'.substring(0, 6 - c.length) + c;
 }
 
+function drawPen (x, y, scale) {
+    ctx.fillStyle = 'white';
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (10 * scale), y);
+    ctx.lineTo(x + (35 * scale), y - (25 * scale));
+    ctx.lineTo(x + (25 * scale), y - (35 * scale));
+    ctx.lineTo(x + (0 * scale), y - (10 * scale));
+    ctx.lineTo(x, y);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x + (39 * scale), y - (29 * scale));
+    ctx.lineTo(x + (46 * scale), y - (36 * scale));
+    ctx.lineTo(x + (36 * scale), y - (46 * scale));
+    ctx.lineTo(x + (29 * scale), y - (39 * scale));
+    ctx.fill();
+
+    ctx.fillStyle = 'red';
+}
+
 function loop () {
     requestAnimationFrame(loop);
 
@@ -51,18 +72,22 @@ function loop () {
         ctx.stroke();
     }
 
-    ctx.drawImage(pen.img, pen.x, pen.y - pen.height, pen.width, pen.height);
+    drawPen(pen.x, pen.y, 0.35 * pen.scale);
 
     for (var i in pens) {
         if (pens[i] && i !== pen.id) {
-            ctx.drawImage(pens[i].img, pens[i].x, pens[i].y - pens[i].height, pens[i].width, pens[i].height);
+            // ctx.drawImage(pens[i].img, pens[i].x, pens[i].y - pens[i].height, pens[i].width, pens[i].height);
+            drawPen(pens[i].x, pens[i].y, 0.35 * pens[i].scale);
         }
     }
+
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
 }
 
 window.onload = function () {
     // Sets up and connects to the multiplayer server
-    var mp = new Multiplayer(pen, ['x', 'y', 'color', 'down']);
+    var mp = new Multiplayer(pen, ['x', 'y', 'color', 'down', 'scale']);
     mp.addCallback('connect', (id) => {
         pen.color = '#' + intToRGB(hashCode(id));
         pen.id = id;
