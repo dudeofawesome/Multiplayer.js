@@ -7,7 +7,12 @@
     "express": "^4.13.4",
     "socket.io": "^1.4.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-preset-es2015": "6.6.0",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-uglify": "1.5.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,8 +20,11 @@
     "type": "git",
     "url": "https://github.com/dudeofawesome/Multiplayer.js.git"
   },
-  "author": "Louis Orleans <louis@orleans.io> (http://orleans.io/)",
-  "license": "ISC",
+  "author": [
+    "Louis Orleans <louis@orleans.io> (http://orleans.io/)",
+    "Josh Gibbs <josh@gibbs.tk> (http://gibbs.tk/)"
+  ],
+  "license": "GPL-2.0",
   "bugs": {
     "url": "https://github.com/dudeofawesome/Multiplayer.js/issues"
   },

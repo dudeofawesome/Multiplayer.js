@@ -28,7 +28,6 @@ var Multiplayer = function (self, sync, port, address) {
         socket = io.connect(uri);
     }
 
-
     socket.on('connect', () => {
         console.log('Connected');
         console.log('Syncing ' + self);
@@ -42,6 +41,22 @@ var Multiplayer = function (self, sync, port, address) {
                             linkedObjs[i][j] = data[i][j];
                         }
                     }
+                }
+            }
+        });
+
+        socket.on('message', (message) => {
+            if (callbacks.message) {
+                for (let i in callbacks.message) {
+                    callbacks.message[i](message);
+                }
+            }
+        });
+
+        socket.on('data', (message) => {
+            if (callbacks.message) {
+                for (let i in callbacks.message) {
+                    callbacks.message[i](message);
                 }
             }
         });
@@ -61,6 +76,20 @@ var Multiplayer = function (self, sync, port, address) {
                 }
             }
         });
+
+        // catch-all
+        var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            if (socket._callbacks['$' + packet.data[0]]) {
+                onevent.call(this, packet);
+            } else {
+                if (callbacks[packet.data[0]]) {
+                    for (var cb in callbacks[packet.data[0]]) {
+                        callbacks[packet.data[0]][cb](packet.data[1]);
+                    }
+                }
+            }
+        };
 
         setInterval(() => {
             changed = false;
@@ -97,6 +126,12 @@ var Multiplayer = function (self, sync, port, address) {
                 callbacks[type] = [];
             }
             callbacks[type].push(callback);
+        },
+        emit: (token, message) => {
+            socket.emit(token, message);
+        },
+        message: (message) => {
+            socket.emit('message', message);
         },
         linkPlayerID: (id, obj) => {
             linkedObjs[id] = obj;

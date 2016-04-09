@@ -1,68 +1,22 @@
 <html>
 	<head>
 		<title>Multiplayer.js example</title>
+
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/mp/multiplayer.js"></script>
+        <script src="/example.js" type="text/javascript"></script>
+
+        <style>
+            span, div {
+                width: 10px;
+                height: 10px;
+                background-color: red;
+                position: absolute;
+            }
+        </style>
 	</head>
-	<style>
-		span, div {
-			width: 10px;
-			height: 10px;
-			background-color: red;
-			position: absolute;
-		}
-	</style>
 	<body>
         <div id="id" style="background-color:white;">ID:</div>
 		<span id="me"></span>
-		<script type="text/javascript">
-			onload = function() {
-
-				// Sets up and connects to the multiplayer server
-                var me = document.getElementById("me");
-				var mp = new Multiplayer(me.style, ['left', 'top']);
-                mp.addCallback('connect', (id) => {
-                    me.style.backgroundColor = '#' + intToRGB(hashCode(id));
-                });
-                mp.addCallback('newPlayer', (player) => {
-                    let sprite = document.createElement('div');
-                    sprite.id = player.id;
-                    sprite.style.backgroundColor = '#' + intToRGB(hashCode(player.id));
-                    document.body.appendChild(sprite);
-                    mp.linkPlayerID(player.id, sprite.style);
-                });
-                mp.addCallback('deadPlayer', (id) => {
-                    document.getElementsByTagName('body')[0].removeChild(document.getElementById(id));
-                    mp.unlinkPlayerID(id);
-                });
-
-				// Updates mul.me and square position on the screen
-				addEventListener( "mousemove", function(event) {
-					// mul.update({ x:event.pageX, y:event.pageY })
-					me.style.left = event.pageX;
-					me.style.top = event.pageY;
-				});
-			}
-		</script>
-
-
-
-        <script type="text/javascript">
-            function hashCode(str) { // java String#hashCode
-                var hash = 0;
-                for (var i = 0; i < str.length; i++) {
-                   hash = str.charCodeAt(i) + ((hash << 5) - hash);
-                }
-                return hash;
-            }
-
-            function intToRGB(i){
-                var c = (i & 0x00FFFFFF)
-                    .toString(16)
-                    .toUpperCase();
-
-                return "00000".substring(0, 6 - c.length) + c;
-            }
-        </script>
 	</body>
 </html>

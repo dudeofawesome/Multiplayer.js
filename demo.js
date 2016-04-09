@@ -22,7 +22,7 @@
 
     multiplayer_server.init('mp').then(() => {
         multiplayer_server.start().then(() =>  {
-            server = http.listen(process.env.PORT || 8081, () => {
+            server = http.listen(process.env.PORT || 8080, () => {
                 console.log(`Listening on ${server.address().port}`);
             });
         });
