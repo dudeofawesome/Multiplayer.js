@@ -12,7 +12,7 @@
             init: (subdir) => {
                 return new Promise((resolve) => {
                     let mpScript;
-                    fs.readFile(`./${(process.env.PRODUCTION) ? '' : 'src/'}multiplayer${(process.env.PRODUCTION) ? '.min' : ''}.js`, (err, file) => {
+                    fs.readFile(`./${(process.env.PRODUCTION) ? 'dist/' : 'src/'}multiplayer${(process.env.PRODUCTION) ? '.min' : ''}.js`, (err, file) => {
                         mpScript = file.toString();
                     });
 
