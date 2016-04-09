@@ -19,6 +19,8 @@ function addDot (x, y, color) {
     sprite.style.position = 'absolute';
     sprite.style.left = x;
     sprite.style.top = y;
+    sprite.style.width = 5;
+    sprite.style.height = 5;
     sprite.style.backgroundColor = color;
     document.body.appendChild(sprite);
 }
